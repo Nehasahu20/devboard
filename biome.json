@@ -5,6 +5,10 @@
     "clientKind": "git",
     "useIgnoreFile": true
   },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": ["**", "!dist", "!node_modules", "!public"]
+  },
   "assist": {
     "enabled": true,
     "actions": {
@@ -22,6 +26,9 @@
       },
       "style": {
         "useConst": "error"
+      },
+      "suspicious": {
+        "noUnknownAtRules": "off"
       }
     }
   },
@@ -40,6 +47,11 @@
       "quoteProperties": "asNeeded",
       "trailingCommas": "all",
       "semicolons": "always"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
     }
   }
 }
