@@ -1,5 +1,5 @@
-# Stage 1 — build the app into static files
-FROM dhi.io/node:22-dev AS build
+# Stage 1 — build the app and prepare production dependencies
+FROM dhi.io/node:26-dev AS build
 
 WORKDIR /app
 
@@ -11,21 +11,28 @@ COPY . .
 
 RUN npm run build
 
-# Stage 2 — runtime with production dependencies only
-FROM dhi.io/node:22-dev
+# Stage 1b — install only production dependencies (minimal runtime deps)
+FROM dhi.io/node:26-dev AS prod-deps
 
 WORKDIR /app
 
-# Copy only built files from builder
-COPY --from=build /app/dist ./dist
-COPY vite.preview.config.js ./vite.config.js
+COPY package*.json ./
 
-# Install production dependencies only (vite for preview)
-# Pin vite version to avoid supply chain attacks
 RUN npm install --only=production vite@5.4.11 && \
     npm cache clean --force && \
-    find /app -type f -name "*.md" -delete && \
-    find /app -type f -name "package-lock.json" -delete
+    find node_modules -type f -name "*.md" -delete
+
+# Stage 2 — distroless runtime (minimal, secure)
+FROM dhi.io/node:26
+
+WORKDIR /app
+
+# Copy built files from builder
+COPY --from=build /app/dist ./dist
+
+# Copy production node_modules
+COPY --from=prod-deps /app/node_modules ./node_modules
+COPY vite.preview.config.js ./vite.config.js
 
 EXPOSE 4173
 
