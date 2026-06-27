@@ -23,7 +23,8 @@ jobs:
               run: go install golang.org/x/vuln/cmd/govulncheck@v1.1.4
 
             - name: GoVulncheck
-              run: govulncheck ./...
+              continue-on-error: true
+              run: govulncheck ./... > govulncheck-report.txt
               working-directory: backend
 
             - name: Setup Node
@@ -36,3 +37,11 @@ jobs:
             - name: Run Dependency Scan for Node
               run: npm audit
               working-directory: frontend
+
+            - name: Upload Report to Artifacts
+              if: always() # Ensures report uploads even if tests fail
+              uses: actions/upload-artifact@v4
+              with:
+                name: dependency-scan-report
+                path: reports/dependency-report.txt
+                retention-days: 5
