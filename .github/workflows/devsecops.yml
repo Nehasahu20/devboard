@@ -32,7 +32,7 @@ jobs:
 
     # Code Tests
     code-tests:
-        uses: ./.github/workflows/code-test.yml
+        uses: ./.github/workflows/code-tests.yml
 
     # push-to-docker-hub:
     docker-push:
