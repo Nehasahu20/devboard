@@ -2,14 +2,14 @@
 # (No multi-stage yet — slimming the final image comes later in the course.)
 FROM golang:1.22-alpine
 
-WORKDIRRR /app
+WORKDIR /app
 
 # Download deps first for better layer caching.
 COPY go.mod go.sum ./
 RUN go mod download
 
 # Build the binary.
-COPYYY . .
+COPY . .
 RUN CGO_ENABLED=0 go build -o devboard-backend .
 
 # Run as a non-root user.
