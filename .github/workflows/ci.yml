@@ -4,18 +4,21 @@ name: CI
 
 on: 
     push:
-        branches: [advanced]
+        # paths:
+        #   - '**'
+        #   - '!.github/workflows/**'
+        branches: [feat/matrix-docker-build]
 
 jobs:
-    frontend:
+    lint-frontend:
         # Github runner
         runs-on: ubuntu-latest
         steps:
             - name: Checkout Code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
 
             - name: Setup NodeJs
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6
               with:
                 node-version: '20'
                 cache: npm
@@ -33,34 +36,20 @@ jobs:
               run: npm run test 
               working-directory: frontend
             
-            - name: Docker Setup [Login]
-              uses: docker/login-action@v4
-              with:
-                username: ${{ vars.DOCKERHUB_USERNAME }}
-                password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-            - name: Docker Build and Push
-              uses: docker/build-push-action@v7
-              with:
-                context: ./frontend
-                push: true
-                tags: neha42776/devboard-frontend:latest
-
-
                 
-    backend:
+    lint-backend:
         # Github runner
         runs-on: ubuntu-latest
         steps:
             - name: Checkout Code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
 
             - name: Setup Go
-              uses: actions/setup-go@v5
+              uses: actions/setup-go@v6
               with:
                 go-version: '1.23'
-                go-version-file: 'backend/go.mod'
-                cache-dependency-path: backend/go.sum 
+                go-version-file: 'go.mod'
+                cache-dependency-path: go.sum
             
             - name: Run Go Formatter
               run: go fmt
@@ -73,21 +62,33 @@ jobs:
             - name: Run Tests
               run: go test 
               working-directory: backend
-            
+          
+
+    build-and-push:
+        needs: [lint-frontend,lint-backend] 
+        runs-on: ubuntu-latest
+        strategy:
+          matrix:
+            folder: ['frontend','backend']
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v7
+
             - name: Docker Setup [Login]
               uses: docker/login-action@v4
               with:
-                username: ${{ vars.DOCKERHUB_USERNAME }}
-                password: ${{ secrets.DOCKERHUB_TOKEN }}
+                  username: ${{ vars.DOCKERHUB_USERNAME }}
+                  password: ${{ secrets.DOCKERHUB_TOKEN }}
 
             - name: Docker Build and Push
               uses: docker/build-push-action@v7
               with:
-                context: ./backend
+                context: ./${{ matrix.folder}}
                 push: true
-                tags:  neha42776/devboard-backend:latest
+                tags: ${{ vars.DOCKERHUB_USERNAME }}/devboard-${{ matrix.folder}}:latest
+          
 
     deploy:
-        needs: [frontend,backend]
+        needs: [lint-frontend,lint-backend,build-and-push]
         uses: ./.github/workflows/cd.yml
         secrets: inherit
