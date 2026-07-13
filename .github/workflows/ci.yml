@@ -32,3 +32,55 @@ jobs:
         run: |
           cd frontend
           npm run test
+
+      - name: Docker Setup [login]
+        uses: docker/login-action@v4
+        with:
+            username: ${{ vars.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker Build and Push
+        uses: docker/build-push-action@v7
+        with: 
+            context: .\frontend\
+            push: true
+            tags: ${{ vars.DOCKERHUB_USERNAME }}/devboard-frontend:latest
+
+  backend: 
+    # Github runner
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v7    
+        with:
+            go-version: '1.23'
+            go-version-file: 'go.mod'
+            cache-dependency-path: 'go.sum'
+
+      - name: Run Go Formatter
+        run: go fmt
+        working-directory: backend
+
+      - name: Run Go Vet
+        run: go vet
+        working-directory: backend
+
+      - name: Run Tests
+        run: go test
+        working-directory: backend
+
+      - name: Docker Setup [login]
+        uses: docker/login-action@v4
+        with:
+            username: ${{ vars.DOCKERHUB_USERNAME }}
+            password: ${{ secrets. DOCKERHUB_TOKEN }}
+
+      - name: Docker Build and Push
+        uses: docker/build-push-action@v7
+        with: 
+            context: ./backend
+            push: true
+            tags: ${{ vars.DOCKERHUB_USERNAME }}/devboard-backend:latest
