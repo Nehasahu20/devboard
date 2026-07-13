@@ -44,7 +44,8 @@ jobs:
               with:
                 context: ./frontend
                 push: true
-                tags: ${{ vars.DOCKERHUB_USERNAME }}/devboard-frontend:latest
+                tags: neha42776/devboard-frontend:latest  
+                
                 
     backend:
         # Github runner
@@ -83,5 +84,4 @@ jobs:
               with:
                 context: ./backend
                 push: true
-                tags: ${{ vars.DOCKERHUB_USERNAME }}/devboard-backend:latest
-    
+                tags: neha42776/devboard-backend:latest
