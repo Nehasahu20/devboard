@@ -61,6 +61,24 @@ jobs:
           name: trivy-${{ matrix.service }}-report
           path: trivy-${{ matrix.service }}.sarif
 
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Sign Image with cosign (keyless)
+        env:
+          ECR_REGISTRY: 651023585812.dkr.ecr.ap-south-1.amazonaws.com
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          cosign sign --yes \
+            $ECR_REGISTRY/devboard-${{ matrix.service }}:$IMAGE_TAG
+
+      - name: Generate SBOM with Syft
+        uses: anchore/sbom-action@v0
+        with:
+          image: 651023585812.dkr.ecr.ap-south-1.amazonaws.com/devboard-${{ matrix.service }}:${{ github.sha }}
+          artifact-name: sbom-${{ matrix.service }}.spdx.json
+          format: spdx-json
+
       - name: Update and Commit Manifest
         env:
           ECR_REGISTRY: 651023585812.dkr.ecr.ap-south-1.amazonaws.com
