@@ -59,11 +59,12 @@ jobs:
 
           git add k8s/${{ matrix.service }}-deployment.yml
 
-          git diff --staged --quiet && echo "No changes" && exit 0
-
-          git stash
-          git pull --rebase origin master
-          git stash pop
+          if git diff --staged --quiet; then
+            echo "No manifest changes, skipping commit"
+            exit 0
+          fi
 
           git commit -m "ci: update ${{ matrix.service }} image to $IMAGE_TAG"
-          git push
+
+          git pull --rebase origin master
+          git push origin master
