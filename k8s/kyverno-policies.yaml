@@ -1,0 +1,71 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-latest-tag
+
+spec:
+  validationFailureAction: Audit
+
+  rules:
+    - name: require-image-tag
+      match:
+        resources:
+          kinds:
+            - Pod
+
+      validate:
+        message: "latest tag is not allowed"
+        pattern:
+          spec:
+            containers:
+              - image: "!*:latest"
+
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-root-user
+
+spec:
+  validationFailureAction: Audit
+
+  rules:
+    - name: check-root-user
+      match:
+        resources:
+          kinds:
+            - Pod
+
+      validate:
+        message: "Root user is not allowed"
+        pattern:
+          spec:
+            containers:
+              - (securityContext):
+                  =(runAsNonRoot): true
+
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-resource-limits
+
+spec:
+  validationFailureAction: Audit
+
+  rules:
+    - name: check-resource-limits
+      match:
+        resources:
+          kinds:
+            - Pod
+
+      validate:
+        message: "CPU and memory limits are required"
+        pattern:
+          spec:
+            containers:
+              - resources:
+                  limits:
+                    memory: "?*"
+                    cpu: "?*"
