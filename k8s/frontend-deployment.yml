@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: devboard-frontend
-        image: 651023585812.dkr.ecr.ap-south-1.amazonaws.com/devboard-frontend:1053d1b469a3580cba67e8155345041dc8bcc433
+        image: 651023585812.dkr.ecr.ap-south-1.amazonaws.com/devboard-frontend:8a3663349fc7b775d537d7e181b6adf007e20ffa
         ports:
         - containerPort: 4173
         resources:
