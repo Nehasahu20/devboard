@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: devboard-backend
-        image: 651023585812.dkr.ecr.ap-south-1.amazonaws.com/devboard-backend:c1630b09d774bb481ed975e46e0655d02e6a58bd
+        image: 651023585812.dkr.ecr.ap-south-1.amazonaws.com/devboard-backend:b43b61a83eb874c007125c9fb452dbb798f2b767
         ports:
           - containerPort: 8080
         env:
