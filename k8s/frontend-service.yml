@@ -11,4 +11,4 @@ spec:
     port: 8080
     targetPort: 4173  # Pod port
     nodePort: 30080  # Node ka port
-  type: NodePort
+  type: LoadBalancer
