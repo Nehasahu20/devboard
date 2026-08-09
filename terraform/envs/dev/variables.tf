@@ -1,0 +1,13 @@
+variable "aws_region"         { default = "ap-south-1" }
+  variable "project_name"       { default = "devboard" }                                                                                                     
+  variable "vpc_cidr"           { default = "10.0.0.0/16" }                                                                                                  
+  variable "availability_zones" { default = ["ap-south-1a", "ap-south-1b"] }                                                                                 
+  variable "public_subnets"     { default = ["10.0.1.0/24", "10.0.2.0/24"] }                                                                                 
+  variable "private_subnets"    { default = ["10.0.3.0/24", "10.0.4.0/24"] }                                                                                 
+  variable "cluster_version"    { default = "1.31" }                                                                                                         
+  variable "node_instance_type" { default = "t3.medium" }                                                                                                    
+  variable "node_desired_size"  { default = 2 }                                                                                                              
+  variable "node_min_size"      { default = 2 }                                                                                                              
+  variable "node_max_size"      { default = 3 }                                                                                                              
+  variable "github_org"         { description = "Your GitHub username" }                                                                                     
+  variable "github_repo"        { description = "Repo name e.g. devboard" }      
